@@ -1,0 +1,96 @@
+apply plugin: 'com.android.application'
+
+//获取版本号
+def verCode() {
+    def versionPropsFile = file("../version.properties")
+    if (versionPropsFile.canRead()) {
+        Properties versionProps = new Properties()
+        versionProps.load(new FileInputStream(versionPropsFile))
+
+        def int verCode = versionProps['VERSION_CODE'].toInteger()
+        return verCode;
+    } else {
+        throw new GradleException("Could not read gradle.properties")
+    }
+}
+
+//获取版本名
+def verName() {
+    def versionPropsFile = file("../version.properties")
+    if (versionPropsFile.canRead()) {
+        Properties versionProps = new Properties()
+        versionProps.load(new FileInputStream(versionPropsFile))
+
+        return versionProps['VERSION_NAME']
+    } else {
+        throw new GradleException("Could not read gradle.properties")
+    }
+}
+
+android {
+    compileSdkVersion 26
+    buildToolsVersion "27.0.3"
+    defaultConfig {
+        applicationId "com.idophin.farmingtong"
+        minSdkVersion 19
+        targetSdkVersion 22
+        versionCode verCode()
+        versionName verName()
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    signingConfigs {
+        release {
+            v1SigningEnabled true
+            v2SigningEnabled true
+            keyAlias 'idophin'
+            keyPassword 'idophin001'
+            storeFile file('../idophin.jks')
+            storePassword 'idophin001'
+        }
+    }
+
+    buildTypes {
+        release {
+            buildConfigField 'String', 'API_URL', '"https://api.callhsl.com/api"'
+            buildConfigField 'String', 'SHARE_URL', '"https://www.callhsl.com"'
+            minifyEnabled true //是否混淆
+            zipAlignEnabled true //Zipalign优化
+            shrinkResources true //是否移除无用资源
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+
+        debug {
+            buildConfigField 'String', 'API_URL', '"http://test.byhsl.tmlsoft.com:81/api"'
+            buildConfigField 'String', 'SHARE_URL', '"http://test.byhsl.tmlsoft.com:82"'
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.android.support:appcompat-v7:26.1.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.1'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+
+    compile 'com.android.support:design:26.1.0'
+    compile 'com.android.support:recyclerview-v7:26.1.0'
+
+    compile 'com.squareup.retrofit2:retrofit:2.1.0'
+    compile 'com.squareup.retrofit2:converter-gson:2.1.0'
+    compile 'com.squareup.retrofit2:adapter-rxjava:2.1.0'
+    compile 'com.squareup.okhttp3:okhttp:3.4.1'
+    compile 'io.reactivex:rxandroid:1.2.1'
+
+    //选择图片
+    compile 'com.longsh:PhotoPicker:1.5.0'
+    compile "com.nineoldandroids:library:2.4.0"
+    compile "com.github.bumptech.glide:glide:3.7.0"
+    compile 'com.yalantis:ucrop:2.2.0'
+
+}
